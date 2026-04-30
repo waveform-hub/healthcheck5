@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#141414">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinTrack">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/manifest+json,{%22name%22:%22FinTrack%22,%22short_name%22:%22FinTrack%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%23141414%22,%22theme_color%22:%22%23141414%22}">
+<title>FinTrack</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #141414;
+  --bg2:       #1c1c1c;
+  --bg3:       #242424;
+  --bg4:       #2e2e2e;
+  --line:      #303030;
+  --line2:     #404040;
+  --tx:        #f0ece0;
+  --tx2:       #b0aa9c;
+  --tx3:       #666058;
+  --green:     #7ee8a2;
+  --green-bg:  rgba(126,232,162,0.07);
+  --green-bd:  rgba(126,232,162,0.18);
+  --red:       #f28b82;
+  --red-bg:    rgba(242,139,130,0.07);
+  --red-bd:    rgba(242,139,130,0.18);
+  --amber:     #ffc87a;
+  --amber-bg:  rgba(255,200,122,0.07);
+  --amber-bd:  rgba(255,200,122,0.18);
+  --blue:      #82c9f2;
+  --blue-bg:   rgba(130,201,242,0.07);
+  --blue-bd:   rgba(130,201,242,0.18);
+  --pink:      #f2a8c8;
+  --pink-bg:   rgba(242,168,200,0.07);
+  --pink-bd:   rgba(242,168,200,0.18);
+  --r: 6px;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --nav-h: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;min-height:100dvh;overscroll-behavior:none}
+.shell{max-width:1120px;margin:0 auto;padding:0 20px calc(60px + var(--nav-h) + var(--safe-bot))}
+
+/* ── HEADER ── */
+.header{padding:calc(16px + var(--safe-top)) 0 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px}
+.logo{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--tx3)}
+.header-title{font-size:22px;font-weight:600;color:var(--tx);letter-spacing:-0.01em;margin-top:3px}
+.live-dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-left:8px;animation:pulse 2s ease-in-out infinite;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+.header-meta{text-align:right;font-family:var(--mono);font-size:11px;color:var(--tx3);display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.month-badge{display:flex;align-items:center;gap:8px}
+.month-label{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--tx)}
+.btn-new-month{background:transparent;border:1px solid var(--line2);border-radius:4px;color:var(--tx3);font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;cursor:pointer;transition:all 0.15s;white-space:nowrap;min-height:32px}
+.btn-new-month:hover{color:var(--tx2);border-color:var(--tx3)}
+
+/* ── TABS (desktop) ── */
+.tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:4px;width:fit-content}
+.tab{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--tx3);padding:7px 20px;border-radius:4px;cursor:pointer;transition:all 0.15s;user-select:none;border:none;background:none;min-height:36px}
+.tab:hover{color:var(--tx2);background:var(--bg3)}
+.tab.active{background:var(--bg4);color:var(--tx);border:1px solid var(--line2)}
+
+/* ── BOTTOM NAV (mobile) ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--bg2);border-top:1px solid var(--line);padding:8px 0 calc(8px + var(--safe-bot))}
+.bottom-nav-inner{display:flex;justify-content:space-around;max-width:480px;margin:0 auto}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 16px;border:none;background:none;cursor:pointer;color:var(--tx3);transition:color 0.15s;min-width:64px;min-height:48px;justify-content:center}
+.bnav-item.active{color:var(--green)}
+.bnav-icon{font-size:20px;line-height:1}
+.bnav-label{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase}
+
+/* ── VIEW ── */
+.view{display:none}
+.view.active{display:block;animation:appear 0.2s ease}
+@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION LABEL ── */
+.sl{font-family:var(--mono);font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.sl::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.ch{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.ch-label{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--tx3)}
+.ch-val{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--tx)}
+
+/* ── ROWS ── */
+.row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line);transition:background 0.1s}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--bg3)}
+.rl{font-size:13px;color:var(--tx2)}
+.rn{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.rv{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--tx)}
+.rtotal{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;background:var(--bg3);border-top:1px solid var(--line2)}
+.rtotal .rl{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:0.06em}
+.rtotal .rv{font-size:14px}
+
+/* colours */
+.cg{color:var(--green)!important} .cr{color:var(--red)!important}
+.ca{color:var(--amber)!important} .cb{color:var(--blue)!important}
+.cp{color:var(--pink)!important}  .cd{color:var(--tx3)!important}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0}
+.stat.sg::after{background:var(--green)}.stat.sr::after{background:var(--red)}
+.stat.sa::after{background:var(--amber)}.stat.sb::after{background:var(--blue)}
+.stat-lbl{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:8px}
+.stat-num{font-family:var(--mono);font-size:20px;font-weight:600;line-height:1;margin-bottom:4px}
+.stat-sub{font-size:11px;color:var(--tx3)}
+
+/* ── PBAR ── */
+.pbar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:8px}
+.pfill{height:100%;border-radius:2px;transition:width 0.5s ease}
+
+/* ── BADGE ── */
+.badge{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;border:1px solid}
+.badge.g{color:var(--green);border-color:var(--green-bd);background:var(--green-bg)}
+.badge.r{color:var(--red);border-color:var(--red-bd);background:var(--red-bg)}
+.badge.a{color:var(--amber);border-color:var(--amber-bd);background:var(--amber-bg)}
+.badge.b{color:var(--blue);border-color:var(--blue-bd);background:var(--blue-bg)}
+.badge.p{color:var(--pink);border-color:var(--pink-bd);background:var(--pink-bg)}
+.badge.d{color:var(--tx3);border-color:var(--line);background:var(--bg3)}
+
+/* ── ALERT ── */
+.alert{border-radius:var(--r);padding:13px 16px;margin-bottom:14px;font-size:13px;line-height:1.7;border:1px solid}
+.alert.r{background:var(--red-bg);border-color:var(--red-bd);color:var(--tx2)}
+.alert.a{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--tx2)}
+.alert.g{background:var(--green-bg);border-color:var(--green-bd);color:var(--tx2)}
+.alert.b{background:var(--blue-bg);border-color:var(--blue-bd);color:var(--tx2)}
+.alert-title{font-weight:600;font-size:13px;margin-bottom:3px}
+.alert.r .alert-title{color:var(--red)}.alert.a .alert-title{color:var(--amber)}
+.alert.g .alert-title{color:var(--green)}.alert.b .alert-title{color:var(--blue)}
+
+/* ── FORMS ── */
+.field{margin-bottom:13px}
+.flabel{font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;display:block}
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--line2);border-radius:4px;color:var(--tx);font-family:var(--mono);font-size:16px;padding:11px 12px;outline:none;transition:border-color 0.15s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--line2);box-shadow:0 0 0 2px rgba(255,255,255,0.04)}
+input::placeholder{color:var(--tx3)}
+select option{background:var(--bg3)}
+.btn{width:100%;background:var(--tx);color:var(--bg);border:none;border-radius:4px;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:14px;cursor:pointer;transition:all 0.15s;margin-top:2px;min-height:48px}
+.btn:hover{background:var(--tx2)}
+.btn-ghost{background:transparent;color:var(--tx3);border:1px solid var(--line);border-radius:4px;font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:all 0.15s;width:auto;min-height:40px}
+.btn-ghost:hover{color:var(--tx2);border-color:var(--line2)}
+.btn-sm{background:var(--bg3);color:var(--tx2);border:1px solid var(--line);border-radius:4px;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 12px;cursor:pointer;transition:all 0.15s;width:auto;min-height:36px}
+.btn-sm:hover{border-color:var(--line2);color:var(--tx)}
+.btn-pay{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);border-radius:4px;font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;padding:7px 12px;cursor:pointer;transition:all 0.15s;min-height:36px}
+.btn-pay:hover{background:rgba(126,232,162,0.15)}
+
+/* ── EDITABLE INLINE ── */
+.editable{cursor:text;border-radius:3px;padding:2px 5px;margin:-2px -5px;transition:background 0.15s;display:inline-block;min-width:20px}
+.editable:hover{background:var(--bg4)}
+.editable:focus{background:var(--bg4);outline:1px solid var(--line2);color:var(--tx)}
+
+/* ── DEBT CARDS ── */
+.debt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dcard{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.dcard-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start}
+.dname{font-size:15px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.dsub{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.dtags{display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.dmeta{display:grid;border-bottom:1px solid var(--line)}
+.dmc{padding:10px 14px;border-right:1px solid var(--line)}
+.dmc:last-child{border-right:none}
+.dmc-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:3px}
+.dmc-val{font-family:var(--mono);font-size:14px;font-weight:500}
+.dbody{padding:12px 16px 14px}
+
+/* editable monthly inside debt card */
+.monthly-edit-wrap{display:flex;align-items:center;gap:6px}
+.monthly-edit-wrap span{font-family:var(--mono);font-size:10px;color:var(--tx3)}
+.monthly-input{background:var(--bg3);border:1px solid var(--line2);border-radius:3px;color:var(--tx);font-family:var(--mono);font-size:16px;font-weight:500;padding:5px 8px;width:90px;outline:none;transition:border-color 0.15s}
+.monthly-input:focus{border-color:var(--line2);box-shadow:0 0 0 2px rgba(255,255,255,0.04)}
+.dcard-note{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:4px;color:var(--tx2);font-family:var(--mono);font-size:13px;padding:8px 10px;resize:none;outline:none;height:44px;line-height:1.5;margin-top:10px;transition:border-color 0.15s}
+.dcard-note:focus{border-color:var(--line2)}
+.dcard-note::placeholder{color:var(--tx3)}
+
+/* ── DEBT PAY FORM ── */
+.debt-pay-form{background:var(--bg3);border-radius:var(--r);padding:12px;margin-top:10px;border:1px solid var(--green-bd)}
+.debt-pay-form .field{margin-bottom:8px}
+.debt-pay-row{display:flex;gap:8px;align-items:flex-end}
+.debt-pay-row .field{flex:1;margin-bottom:0}
+
+/* ── EXPENSE LOG TABLE (desktop) ── */
+.logtbl{width:100%;border-collapse:collapse}
+.logtbl th{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--tx3);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg3);font-weight:400}
+.logtbl td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--tx2)}
+.logtbl tr:last-child td{border-bottom:none}
+.logtbl tr:hover td{background:var(--bg3)}
+.del{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:3px;transition:all 0.1s;line-height:1;min-height:36px;min-width:36px}
+.del:hover{color:var(--red);background:var(--red-bg)}
+.edit-btn{background:none;border:none;color:var(--tx3);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:3px;font-family:var(--mono);letter-spacing:0.05em;min-height:36px}
+.edit-btn:hover{color:var(--amber);background:var(--amber-bg)}
+.empty{padding:36px;text-align:center;color:var(--tx3);font-size:13px;font-style:italic}
+
+/* ── WALLET CARDS ── */
+.wallets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.wallet{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;transition:border-color 0.2s}
+.wallet:hover{border-color:var(--line2)}
+.wallet-icon{font-size:20px;margin-bottom:8px}
+.wallet-name{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.wallet-opening-lbl{font-family:var(--mono);font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
+.wallet-bal-input{background:transparent;border:none;border-bottom:1px solid var(--line2);border-radius:0;color:var(--tx);font-family:var(--mono);font-size:20px;font-weight:600;line-height:1;padding:0 0 2px;width:100%;outline:none;transition:border-color 0.15s;font-size:16px}
+.wallet-bal-input:focus{border-bottom-color:var(--tx3)}
+.wallet-avail{font-family:var(--mono);font-size:12px;font-weight:600;margin-top:6px}
+.wallet-spent{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:2px}
+.wallet-total-bar{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.wtb-label{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tx3)}
+.wtb-val{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--green)}
+
+/* ── LOGGER LAYOUT ── */
+.logger-layout{display:grid;grid-template-columns:300px 1fr;gap:20px}
+
+/* ── BUDGET LAYOUT ── */
+.budget-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:20px}
+.alloc-row{padding:13px 0;border-bottom:1px solid var(--line)}
+.alloc-row:last-child{border-bottom:none}
+.alloc-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.alloc-name{font-size:13px;color:var(--tx2)}
+.alloc-amt{font-family:var(--mono);font-size:14px;font-weight:500}
+.alloc-pct{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:3px}
+
+/* ── DASH GRID ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+
+/* ── PROJ TABLE ── */
+.proj-tbl{width:100%;border-collapse:collapse}
+.proj-tbl th{font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--tx3);text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg3);font-weight:400}
+.proj-tbl td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--tx2)}
+.proj-tbl tr:last-child td{border-bottom:none}
+.proj-tbl tr:hover td{background:var(--bg3)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(24px + var(--nav-h) + var(--safe-bot));right:20px;background:var(--bg3);border:1px solid var(--line2);color:var(--tx);font-family:var(--mono);font-size:12px;padding:10px 16px;border-radius:var(--r);z-index:9999;opacity:0;transform:translateY(6px);transition:all 0.2s;pointer-events:none;max-width:calc(100vw - 40px)}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── MODAL / SHEET ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex;animation:fadeIn 0.15s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{background:var(--bg2);border:1px solid var(--line);border-radius:12px 12px 0 0;width:100%;max-width:560px;padding:20px 20px calc(20px + var(--safe-bot));animation:slideUp 0.2s ease;max-height:90dvh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:40px;height:4px;background:var(--line2);border-radius:2px;margin:0 auto 16px}
+.modal-title{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--tx3);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.modal-actions .btn{flex:1;margin-top:0}
+.btn-cancel{flex:1;background:transparent;color:var(--tx3);border:1px solid var(--line);border-radius:4px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:14px;cursor:pointer;min-height:48px}
+
+/* ── NEW MONTH MODAL ── */
+.archive-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
+.archive-row:last-child{border-bottom:none}
+
+/* ── MOBILE EXPENSE CARDS (replaces table on mobile) ── */
+.exp-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.exp-card-left{flex:1;min-width:0}
+.exp-card-desc{font-size:14px;color:var(--tx);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-card-meta{font-family:var(--mono);font-size:10px;color:var(--tx3);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap}
+.exp-card-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.exp-card-amount{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--amber)}
+.exp-card-actions{display:flex;gap:4px}
+
+/* ── RESPONSIVE ── */
+@media(min-width:640px){
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .wallets{grid-template-columns:repeat(4,1fr)}
+}
+
+@media(max-width:860px){
+  .stats{grid-template-columns:1fr 1fr}
+  .wallets{grid-template-columns:1fr 1fr}
+  .dash-grid,.debt-grid,.logger-layout,.budget-grid{grid-template-columns:1fr}
+  .proj-tbl th:nth-child(5),.proj-tbl td:nth-child(5){display:none}
+}
+
+@media(max-width:640px){
+  :root{--nav-h:60px}
+  .tabs{display:none}
+  .bottom-nav{display:flex;flex-direction:column}
+  .shell{padding-left:16px;padding-right:16px}
+  .header-title{font-size:18px}
+  .stat-num{font-size:17px}
+  .stats{grid-template-columns:1fr 1fr;gap:8px}
+  .wallets{grid-template-columns:1fr 1fr;gap:8px}
+  .logger-layout{grid-template-columns:1fr}
+  /* expense table → hidden on mobile, cards shown instead */
+  .logtbl-wrap{display:none}
+  .exp-cards-wrap{display:block}
+  .debt-grid{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr}
+  .budget-grid{grid-template-columns:1fr}
+  .btn-new-month{font-size:8px;padding:3px 8px}
+  .month-label{font-size:12px}
+  /* proj table scroll on mobile */
+  .proj-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .proj-tbl{min-width:480px}
+}
+
+@media(min-width:641px){
+  .logtbl-wrap{display:block}
+  .exp-cards-wrap{display:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <div class="logo">FinTrack <span class="live-dot"></span></div>
+      <div class="header-title">Personal Finance Dashboard</div>
+    </div>
+    <div class="header-meta">
+      <div class="month-badge">
+        <span class="month-label" id="hdate">May 2026</span>
+        <button class="btn-new-month" onclick="openNewMonthModal()">New Month</button>
+      </div>
+      <div style="font-style:italic;font-size:10px">click values to edit</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="go('dashboard',this)">Dashboard</button>
+    <button class="tab" onclick="go('expenses',this)">Expenses</button>
+    <button class="tab" onclick="go('debts',this)">Debts</button>
+    <button class="tab" onclick="go('budget',this)">Budget</button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       DASHBOARD
+  ══════════════════════════════════════ -->
+  <div id="view-dashboard" class="view active">
+
+    <div class="stats">
+      <div class="stat sg">
+        <div class="stat-lbl">Take-Home</div>
+        <div class="stat-num cg">RM 4,050</div>
+        <div class="stat-sub">Gross RM 4,700</div>
+      </div>
+      <div class="stat sr">
+        <div class="stat-lbl">Fixed Outflow</div>
+        <div class="stat-num cr" id="d-outflow">RM —</div>
+        <div class="stat-sub">Commitments + debt</div>
+      </div>
+      <div class="stat sa">
+        <div class="stat-lbl">Available</div>
+        <div class="stat-num ca" id="d-available">RM —</div>
+        <div class="stat-sub">Before daily spend</div>
+      </div>
+      <div class="stat sb">
+        <div class="stat-lbl">Total Debt</div>
+        <div class="stat-num cb" id="d-total-debt">RM —</div>
+        <div class="stat-sub">Across 6 obligations</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- Commitments -->
+      <div>
+        <div class="sl">Fixed Commitments</div>
+        <div class="card">
+          <div class="ch"><span class="ch-label">Monthly Fixed</span><span class="ch-val cr">RM 1,760.77</span></div>
+          <div class="row"><span class="rl">Rent</span><span class="rv">RM 1,100.00</span></div>
+          <div class="row"><span class="rl">WiFi</span><span class="rv">RM 52.50</span></div>
+          <div class="row"><span class="rl">Utilities</span><span class="rv">RM 100.00</span></div>
+          <div class="row"><span class="rl">Dental <span class="rn">(claimable RM500/yr)</span></span><span class="rv ca">RM 150.00</span></div>
+          <div class="row"><span class="rl">Phone</span><span class="rv">RM 35.00</span></div>
+          <div class="row"><span class="rl">Transport</span><span class="rv">RM 50.00</span></div>
+          <div class="row"><span class="rl">Groceries</span><span class="rv">RM 200.00</span></div>
+          <div class="row"><span class="rl">Chair instalment</span><span class="rv">RM 73.27</span></div>
+          <div class="rtotal"><span class="rl">Total</span><span class="rv cr">RM 1,760.77</span></div>
+        </div>
+      </div>
+
+      <!-- Debt Summary -->
+      <div>
+        <div class="sl">Debt Repayments</div>
+        <div class="card">
+          <div class="ch"><span class="ch-label">This Month</span><span class="ch-val cr" id="d-debt-monthly">RM —</span></div>
+          <div class="row" style="background:var(--red-bg);border-left:2px solid var(--red)">
+            <span class="rl" style="flex-direction:column;align-items:flex-start;gap:1px;display:flex">
+              <span>Personal Loan</span>
+              <span class="rn">RM 450 interest + RM 200 principal</span>
+            </span>
+            <span class="rv cr">RM 650.00</span>
+          </div>
+          <div class="row"><span class="rl">CIMB <span class="rn">(SAA, 11-month plan)</span></span><span class="rv ca">RM 220.00</span></div>
+          <div class="row"><span class="rl">Hainan <span class="rn">(study, 0%)</span></span><span class="rv">RM 200.00</span></div>
+          <div class="row"><span class="rl">Shopee <span class="rn">(BNPL)</span></span><span class="rv">RM 128.26</span></div>
+          <div class="row">
+            <span class="rl">Caryna <span class="rn">(personal)</span></span>
+            <span class="rv cp" id="d-caryna-monthly">RM <span id="dd-caryna">0</span></span>
+          </div>
+          <div class="row">
+            <span class="rl">PTPTN <span class="rn">(CCRIS)</span></span>
+            <span class="rv cb" id="d-ptptn-monthly">RM <span id="dd-ptptn">0</span></span>
+          </div>
+          <div class="rtotal"><span class="rl">Total / Month</span><span class="rv cr" id="d-debt-total-row">RM —</span></div>
+        </div>
+
+        <!-- Savings rate -->
+        <div class="card" style="margin-top:14px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--tx3)">Savings Rate</span>
+            <span style="font-family:var(--mono);font-size:16px;font-weight:600" class="ca" id="d-savings-rate">—%</span>
+          </div>
+          <div class="pbar" style="height:6px">
+            <div class="pfill" id="d-savings-bar" style="width:0%;background:linear-gradient(90deg,var(--red),var(--amber) 50%,var(--green))"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">0%</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--green)">Target: 30%</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--tx3)">50%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right col -->
+      <div>
+        <div class="sl">Daily Tracker</div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ch-label">Food Budget Left</span><span class="ch-val cg" id="d-food-left">RM —</span></div>
+          <div class="row"><span class="rl">WFO day</span><span class="rv ca">RM 20.00 / day</span></div>
+          <div class="row"><span class="rl">WFH day</span><span class="rv cg">RM 0.00 / day</span></div>
+          <div class="row"><span class="rl">Logged this month</span><span class="rv" id="d-logged">RM 0.00</span></div>
+          <div class="rtotal"><span class="rl">Remaining</span><span class="rv cg" id="d-remaining">RM —</span></div>
+        </div>
+
+        <div class="sl">Wallet Balances</div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ch-label">Total Funds</span><span class="ch-val cg" id="d-wallet-total">RM —</span></div>
+          <div class="row"><span class="rl">💳 Maybank</span><span class="rv" id="dw-maybank">RM —</span></div>
+          <div class="row"><span class="rl">💜 MAE</span><span class="rv" id="dw-mae">RM —</span></div>
+          <div class="row"><span class="rl">🟦 TnG eWallet</span><span class="rv" id="dw-tng">RM —</span></div>
+          <div class="row"><span class="rl">💵 Cash</span><span class="rv" id="dw-cash">RM —</span></div>
+        </div>
+
+        <div class="sl">Debt-Free Timeline</div>
+        <div class="card">
+          <div class="row"><span class="rl"><span class="badge g" style="margin-right:6px">Quick Win</span>Shopee</span><span class="rv cg" id="tl-shopee" style="font-size:12px">Jul 2026</span></div>
+          <div class="row"><span class="rl"><span class="badge r" style="margin-right:6px">🔥 Priority</span>Personal Loan</span><span class="rv ca" id="tl-personalLoan" style="font-size:12px">ASAP</span></div>
+          <div class="row"><span class="rl">Hainan (0%)</span><span class="rv cd" id="tl-hainan" style="font-size:12px">Oct 2026</span></div>
+          <div class="row"><span class="rl">CIMB SAA</span><span class="rv cd" id="tl-cimb" style="font-size:12px">Apr 2027</span></div>
+          <div class="row"><span class="rl cp">Caryna ♥</span><span class="rv cp" id="tl-caryna" style="font-size:12px">After above</span></div>
+          <div class="row"><span class="rl cb">PTPTN</span><span class="rv cb" id="tl-ptptn" style="font-size:12px">Long-term</span></div>
+        </div>
+      </div>
+
+    </div><!-- /dash-grid -->
+
+    <div class="alert r">
+      <div class="alert-title">⚠ Personal Loan — RM 450/month in pure interest</div>
+      Only RM 200 of your RM 650 payment reduces the actual balance. RM 450 is gone every month.
+      Explore early settlement with your lender — even a partial lump sum cuts future interest significantly.
+    </div>
+    <div class="alert b">
+      <div class="alert-title">PTPTN — Unpaid on CCRIS</div>
+      Log in to <strong>MyPTPTN</strong>, check your instalment, and start even RM 100/month. You can set it in the Debts tab and it'll reflect in your monthly total automatically.
+    </div>
+
+  </div><!-- /dashboard -->
+
+
+  <!-- ══════════════════════════════════════
+       EXPENSES
+  ══════════════════════════════════════ -->
+  <div id="view-expenses" class="view">
+
+    <!-- Wallet balances -->
+    <div class="sl">My Accounts & Wallets</div>
+    <div class="wallets">
+      <div class="wallet">
+        <div class="wallet-icon">💳</div>
+        <div class="wallet-name">Maybank Debit</div>
+        <div class="wallet-opening-lbl">Opening Balance</div>
+        <div>RM <input class="wallet-bal-input" id="w-maybank" type="number" step="0.01" placeholder="0.00" oninput="onWalletInput('maybank')" /></div>
+        <div class="wallet-avail" id="w-bal-maybank">Available: RM 0.00</div>
+        <div class="wallet-spent" id="w-spent-maybank">Spent: RM 0.00</div>
+      </div>
+      <div class="wallet">
+        <div class="wallet-icon">💜</div>
+        <div class="wallet-name">MAE Card</div>
+        <div class="wallet-opening-lbl">Opening Balance</div>
+        <div>RM <input class="wallet-bal-input" id="w-mae" type="number" step="0.01" placeholder="0.00" oninput="onWalletInput('mae')" /></div>
+        <div class="wallet-avail" id="w-bal-mae">Available: RM 0.00</div>
+        <div class="wallet-spent" id="w-spent-mae">Spent: RM 0.00</div>
+      </div>
+      <div class="wallet">
+        <div class="wallet-icon">🟦</div>
+        <div class="wallet-name">TnG eWallet</div>
+        <div class="wallet-opening-lbl">Opening Balance</div>
+        <div>RM <input class="wallet-bal-input" id="w-tng" type="number" step="0.01" placeholder="0.00" oninput="onWalletInput('tng')" /></div>
+        <div class="wallet-avail" id="w-bal-tng">Available: RM 0.00</div>
+        <div class="wallet-spent" id="w-spent-tng">Spent: RM 0.00</div>
+      </div>
+      <div class="wallet">
+        <div class="wallet-icon">💵</div>
+        <div class="wallet-name">Cash</div>
+        <div class="wallet-opening-lbl">Opening Balance</div>
+        <div>RM <input class="wallet-bal-input" id="w-cash" type="number" step="0.01" placeholder="0.00" oninput="onWalletInput('cash')" /></div>
+        <div class="wallet-avail" id="w-bal-cash">Available: RM 0.00</div>
+        <div class="wallet-spent" id="w-spent-cash">Spent: RM 0.00</div>
+      </div>
+    </div>
+    <div class="wallet-total-bar">
+      <span class="wtb-label">Total Across All Accounts</span>
+      <span class="wtb-val" id="wallet-total-exp">RM 0.00</span>
+    </div>
+
+    <!-- Logger + Log -->
+    <div class="logger-layout">
+
+      <!-- Form -->
+      <div>
+        <div class="sl">Log Expense</div>
+        <div class="card" style="padding:18px">
+          <div class="field">
+            <label class="flabel">Description</label>
+            <input type="text" id="exp-desc" placeholder="e.g. nasi lemak, Grab, coffee…" />
+          </div>
+          <div class="field">
+            <label class="flabel">Amount (RM)</label>
+            <input type="number" id="exp-amount" placeholder="0.00" step="0.01" min="0" />
+          </div>
+          <div class="field">
+            <label class="flabel">Paid with</label>
+            <select id="exp-wallet">
+              <option value="maybank">💳 Maybank Debit</option>
+              <option value="mae">💜 MAE Card</option>
+              <option value="tng">🟦 TnG eWallet</option>
+              <option value="cash">💵 Cash</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="flabel">Category</label>
+            <select id="exp-cat">
+              <option value="food">Food</option>
+              <option value="transport">Transport</option>
+              <option value="lifestyle">Lifestyle</option>
+              <option value="debt-extra">Debt (extra payment)</option>
+              <option value="misc">Misc</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="flabel">Day Type</label>
+            <select id="exp-type">
+              <option value="WFO">WFO Day</option>
+              <option value="WFH">WFH Day</option>
+              <option value="Weekend">Weekend</option>
+            </select>
+          </div>
+          <button class="btn" onclick="logExpense()">+ Log Expense</button>
+        </div>
+
+        <div style="margin-top:16px">
+          <div class="sl">This Month by Category</div>
+          <div class="card">
+            <div class="row"><span class="rl">Food</span><span class="rv ca" id="cat-food">RM 0.00</span></div>
+            <div class="row"><span class="rl">Transport</span><span class="rv cb" id="cat-transport">RM 0.00</span></div>
+            <div class="row"><span class="rl">Lifestyle</span><span class="rv cg" id="cat-lifestyle">RM 0.00</span></div>
+            <div class="row"><span class="rl">Debt (extra)</span><span class="rv cr" id="cat-debt-extra">RM 0.00</span></div>
+            <div class="row"><span class="rl">Misc</span><span class="rv" id="cat-misc">RM 0.00</span></div>
+            <div class="rtotal"><span class="rl">Total Spent</span><span class="rv cr" id="total-spent">RM 0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log table -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="sl" style="margin-bottom:0;flex:1">Expense Log <span style="font-size:10px;font-style:italic;color:var(--tx3);letter-spacing:0;text-transform:none">&nbsp;saved in browser</span></div>
+          <button class="btn-ghost" onclick="clearLog()" style="margin-left:12px">Clear All</button>
+        </div>
+        <!-- Desktop table -->
+        <div class="logtbl-wrap card">
+          <table class="logtbl">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Paid With</th>
+                <th>Type</th>
+                <th style="text-align:right">Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="expense-tbody">
+              <tr><td colspan="7"><div class="empty">Nothing logged yet.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Mobile cards -->
+        <div class="exp-cards-wrap" id="expense-cards">
+          <div class="empty">Nothing logged yet.</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /expenses -->
+
+
+  <!-- ══════════════════════════════════════
+       DEBTS
+  ══════════════════════════════════════ -->
+  <div id="view-debts" class="view">
+
+    <div class="alert r" style="margin-bottom:20px">
+      <div class="alert-title">Debt Strategy — customised to you</div>
+      Shopee first (quick win). Personal Loan next — you're bleeding RM 450/month in interest.
+      Start PTPTN in parallel (any amount helps CCRIS). Hainan and CIMB are structured, stay consistent.
+      <strong>For Caryna and PTPTN — set your monthly amount below and it'll update your totals automatically.</strong>
+    </div>
+
+    <div class="debt-grid">
+
+      <!-- Personal Loan -->
+      <div class="dcard" style="border-color:var(--red-bd)">
+        <div class="dcard-head">
+          <div><div class="dname">Personal Loan</div><div class="dsub">Private lender — RM 5,000 original</div></div>
+          <div class="dtags"><span class="badge r">🔥 Priority #1</span><span class="badge r">High Interest</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Monthly Total</div>
+            <div class="dmc-val cr">RM <span class="editable" contenteditable id="d-pl-monthly" oninput="onDebtEdit('personalLoan','monthly',this)">650</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Interest / mo</div>
+            <div class="dmc-val cr">RM <span class="editable" contenteditable id="d-pl-interest" oninput="onDebtEdit('personalLoan','interest',this)">450</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Principal / mo</div>
+            <div class="dmc-val ca">RM <span id="d-pl-principal">200</span></div>
+          </div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr;border-bottom:none">
+          <div class="dmc">
+            <div class="dmc-lbl">Remaining Balance</div>
+            <div class="dmc-val cr">RM <span class="editable" contenteditable id="d-pl-balance" oninput="onDebtEdit('personalLoan','balance',this)">4,800</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Est. Payoff</div>
+            <div class="dmc-val cd" id="payoff-personalLoan">~24 months</div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div class="alert r" style="margin-bottom:8px;font-size:12px">
+            Only the amount above interest chips away at the balance. Increase monthly payment to accelerate payoff and cut total interest cost.
+          </div>
+          <div id="eta-personalLoan" style="font-family:var(--mono);font-size:11px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('personalLoan')">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-personalLoan" style="display:none">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-personalLoan-amt" placeholder="650" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-personalLoan-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('personalLoan')" style="margin-top:0">Confirm Payment</button>
+          </div>
+          <textarea class="dcard-note" placeholder="Lender details, settlement options, contact info…"></textarea>
+        </div>
+      </div>
+
+      <!-- Shopee -->
+      <div class="dcard" style="border-color:var(--green-bd)">
+        <div class="dcard-head">
+          <div><div class="dname">Shopee BNPL</div><div class="dsub">Buy Now Pay Later — almost done</div></div>
+          <div class="dtags"><span class="badge g">Quick Win</span><span class="badge g">~Jul 2026</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Outstanding</div>
+            <div class="dmc-val ca">RM <span class="editable" contenteditable id="d-shopee-balance" oninput="onDebtEdit('shopee','balance',this)">171.44</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Monthly</div>
+            <div class="dmc-val">RM <span class="editable" contenteditable id="d-shopee-monthly" oninput="onDebtEdit('shopee','monthly',this)">128.26</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Clears</div>
+            <div class="dmc-val cg" id="payoff-shopee">~2 months</div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:6px">
+            <span>Progress toward zero</span><span id="d-shopee-pct">~75% done</span>
+          </div>
+          <div class="pbar" style="height:5px"><div class="pfill" id="d-shopee-pbar" style="width:75%;background:var(--green)"></div></div>
+          <div id="eta-shopee" style="font-family:var(--mono);font-size:11px;color:var(--green);margin-top:10px;margin-bottom:4px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;margin-top:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('shopee')">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-shopee" style="display:none">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-shopee-amt" placeholder="128.26" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-shopee-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('shopee')" style="margin-top:0">Confirm Payment</button>
+          </div>
+          <div style="font-size:12px;color:var(--tx3)">Once cleared, redirect monthly payment → Personal Loan to accelerate payoff.</div>
+          <textarea class="dcard-note" placeholder="Notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- CIMB -->
+      <div class="dcard">
+        <div class="dcard-head">
+          <div><div class="dname">CIMB</div><div class="dsub">SAA account — rescheduled repayment</div></div>
+          <div class="dtags"><span class="badge a">Structured</span><span class="badge d">Apr 2027</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Total Owed</div>
+            <div class="dmc-val cr">RM <span class="editable" contenteditable id="d-cimb-total" oninput="onDebtEdit('cimb','total',this)">3,400</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Paid Upfront</div>
+            <div class="dmc-val cg">RM <span class="editable" contenteditable id="d-cimb-paid" oninput="onDebtEdit('cimb','paid',this)">1,000</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Remaining</div>
+            <div class="dmc-val ca">RM <span id="d-cimb-remaining">2,400</span></div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:6px">
+            <span id="d-cimb-prog-label">RM 1,000 of RM 3,400 cleared</span><span id="d-cimb-pct">29%</span>
+          </div>
+          <div class="pbar" style="height:5px"><div class="pfill" id="d-cimb-pbar" style="width:29%;background:var(--amber)"></div></div>
+          <div id="eta-cimb" style="font-family:var(--mono);font-size:11px;color:var(--amber);margin-top:10px;margin-bottom:4px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;margin-top:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('cimb')">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-cimb" style="display:none">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-cimb-amt" placeholder="220" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-cimb-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('cimb')" style="margin-top:0">Confirm Payment</button>
+          </div>
+          <div style="font-size:12px;color:var(--tx3)">RM 220 × 11 months remaining. Don't miss payments — SAA arrangements can be voided.</div>
+          <textarea class="dcard-note" placeholder="SAA reference number, officer contact…"></textarea>
+        </div>
+      </div>
+
+      <!-- Hainan -->
+      <div class="dcard">
+        <div class="dcard-head">
+          <div><div class="dname">Hainan</div><div class="dsub">Study loan — zero interest</div></div>
+          <div class="dtags"><span class="badge g">0% Interest</span><span class="badge d">Low Urgency</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Outstanding</div>
+            <div class="dmc-val ca">RM <span class="editable" contenteditable id="d-hainan-balance" oninput="onDebtEdit('hainan','balance',this)">995</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Monthly</div>
+            <div class="dmc-val">RM <span class="editable" contenteditable id="d-hainan-monthly" oninput="onDebtEdit('hainan','monthly',this)">200</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Clears</div>
+            <div class="dmc-val cd" id="payoff-hainan">~Oct 2026</div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--tx3);margin-bottom:6px">
+            <span>Progress</span><span id="d-hainan-pct">~50% done</span>
+          </div>
+          <div class="pbar" style="height:5px"><div class="pfill" id="d-hainan-pbar" style="width:50%;background:var(--tx3)"></div></div>
+          <div id="eta-hainan" style="font-family:var(--mono);font-size:11px;color:var(--tx3);margin-top:10px;margin-bottom:4px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;margin-top:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('hainan')">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-hainan" style="display:none">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-hainan-amt" placeholder="200" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-hainan-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('hainan')" style="margin-top:0">Confirm Payment</button>
+          </div>
+          <div style="font-size:12px;color:var(--tx3)">0% interest — keep at current pace, no need to rush this one.</div>
+          <textarea class="dcard-note" placeholder="Lender details, notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- Caryna ♥ — editable monthly -->
+      <div class="dcard" style="border-color:var(--pink-bd)">
+        <div class="dcard-head">
+          <div><div class="dname">Caryna ♥</div><div class="dsub">Personal debt — girlfriend — set your own pace</div></div>
+          <div class="dtags"><span class="badge p">Personal</span><span class="badge d">Flexible</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Outstanding</div>
+            <div class="dmc-val cp">RM <span class="editable" contenteditable id="caryna-outstanding" oninput="onDebtEdit('caryna','balance',this)">1,253.11</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Monthly Payment</div>
+            <div class="dmc-val cp">
+              <div class="monthly-edit-wrap">
+                <span>RM</span>
+                <input class="monthly-input" type="number" id="caryna-monthly" value="0" min="0" step="10"
+                  placeholder="0" oninput="onMonthlyInput('caryna')" style="color:var(--pink)" />
+              </div>
+            </div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Interest</div>
+            <div class="dmc-val cg">0%</div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:8px">
+            Set any amount above — it'll update your monthly debt total and available budget automatically.
+            Even RM 100–200/month shows the right intention.
+          </div>
+          <div id="eta-caryna" style="font-family:var(--mono);font-size:11px;color:var(--pink);margin-bottom:8px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('caryna')" style="color:var(--pink);border-color:var(--pink-bd);background:var(--pink-bg)">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-caryna" style="display:none;border-color:var(--pink-bd)">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-caryna-amt" placeholder="0" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-caryna-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('caryna')" style="margin-top:0;background:var(--pink);color:var(--bg)">Confirm Payment ♥</button>
+          </div>
+          <textarea class="dcard-note" placeholder="Arrangement notes, when you plan to start, etc…"></textarea>
+        </div>
+      </div>
+
+      <!-- PTPTN — editable monthly -->
+      <div class="dcard" style="border-color:var(--blue-bd)">
+        <div class="dcard-head">
+          <div><div class="dname">PTPTN</div><div class="dsub">Government study loan — on CCRIS — never paid</div></div>
+          <div class="dtags"><span class="badge b">On CCRIS</span><span class="badge r">Action Needed</span></div>
+        </div>
+        <div class="dmeta" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="dmc">
+            <div class="dmc-lbl">Outstanding</div>
+            <div class="dmc-val cr">RM <span class="editable" contenteditable id="ptptn-outstanding" oninput="onDebtEdit('ptptn','balance',this)">19,597</span></div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">Monthly Payment</div>
+            <div class="dmc-val cb">
+              <div class="monthly-edit-wrap">
+                <span>RM</span>
+                <input class="monthly-input" type="number" id="ptptn-monthly" value="0" min="0" step="50"
+                  placeholder="0" oninput="onMonthlyInput('ptptn')" style="color:var(--blue)" />
+              </div>
+            </div>
+          </div>
+          <div class="dmc">
+            <div class="dmc-lbl">CCRIS Impact</div>
+            <div class="dmc-val cb">Active</div>
+          </div>
+        </div>
+        <div class="dbody">
+          <div class="alert b" style="margin-bottom:8px;font-size:12px">
+            Unpaid PTPTN hurts your CCRIS. Start small — even RM 50 or 100/month signals intent.
+            Log in to <strong>MyPTPTN</strong> to confirm your instalment. Set it above.
+          </div>
+          <div id="eta-ptptn" style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-bottom:4px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:4px;margin-top:8px">
+            <button class="btn-pay" onclick="toggleDebtPay('ptptn')" style="color:var(--blue);border-color:var(--blue-bd);background:var(--blue-bg)">+ Log Payment</button>
+          </div>
+          <div class="debt-pay-form" id="dpf-ptptn" style="display:none;border-color:var(--blue-bd)">
+            <div class="debt-pay-row">
+              <div class="field"><label class="flabel">Amount Paid (RM)</label><input type="number" id="dpf-ptptn-amt" placeholder="0" step="0.01" min="0"></div>
+              <div class="field"><label class="flabel">From Wallet</label><select id="dpf-ptptn-wallet"><option value="maybank">💳 Maybank</option><option value="mae">💜 MAE</option><option value="tng">🟦 TnG</option><option value="cash">💵 Cash</option></select></div>
+            </div>
+            <button class="btn" onclick="logDebtPayment('ptptn')" style="margin-top:0;background:var(--blue);color:var(--bg)">Confirm Payment</button>
+          </div>
+          <textarea class="dcard-note" placeholder="Check MyPTPTN for schedule. Note your plan here…"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /debt-grid -->
+
+    <!-- Payoff table -->
+    <div style="margin-top:28px">
+      <div class="sl">Suggested Payoff Sequence</div>
+      <div class="card">
+        <table class="proj-tbl">
+          <thead>
+            <tr><th>Order</th><th>Debt</th><th>Outstanding</th><th>Monthly</th><th>Reason</th><th>Est. Clear</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge g">1</span></td><td class="cg">Shopee BNPL</td><td id="pt-shopee-bal">RM 171.44</td><td id="pt-shopee-mo">RM 128.26</td><td class="cd">Quick win — frees up monthly cash</td><td class="cg" id="pt-shopee-eta">Jul 2026</td></tr>
+            <tr><td><span class="badge r">2</span></td><td class="cr">Personal Loan</td><td id="pt-personalLoan-bal">RM ~4,800</td><td id="pt-personalLoan-mo">RM 650</td><td class="cd">RM 450/mo interest bleed — highest priority</td><td class="ca" id="pt-personalLoan-eta">ASAP</td></tr>
+            <tr><td><span class="badge b">3</span></td><td class="cb">PTPTN (min)</td><td id="pt-ptptn-bal">RM 19,597</td><td id="pt-ptptn-mo">Your amount</td><td class="cd">Fix CCRIS — run in parallel with above</td><td class="cb" id="pt-ptptn-eta">Long-term</td></tr>
+            <tr><td><span class="badge d">4</span></td><td>Hainan</td><td id="pt-hainan-bal">RM 995</td><td id="pt-hainan-mo">RM 200</td><td class="cd">0% — keep steady</td><td id="pt-hainan-eta">Oct 2026</td></tr>
+            <tr><td><span class="badge d">5</span></td><td>CIMB SAA</td><td id="pt-cimb-bal">RM 2,400</td><td id="pt-cimb-mo">RM 220</td><td class="cd">Structured plan — don't skip</td><td id="pt-cimb-eta">Apr 2027</td></tr>
+            <tr><td><span class="badge p">6</span></td><td class="cp">Caryna ♥</td><td id="pt-caryna-bal">RM 1,253.11</td><td id="pt-caryna-mo">Your amount</td><td class="cd">0%, personal — do right by her</td><td class="cp" id="pt-caryna-eta">After above</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /debts -->
+
+
+  <!-- ══════════════════════════════════════
+       BUDGET
+  ══════════════════════════════════════ -->
+  <div id="view-budget" class="view">
+    <div class="budget-grid">
+
+      <div>
+        <div class="sl">Income Allocation — RM 4,050</div>
+        <div class="card" style="padding:4px 16px 16px">
+          <div class="alloc-row">
+            <div class="alloc-top"><span class="alloc-name">Fixed Commitments</span><span class="alloc-amt cr">RM 1,760.77</span></div>
+            <div class="pbar"><div class="pfill" style="width:43.5%;background:var(--red)"></div></div>
+            <div class="alloc-pct">43.5% of income</div>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-top"><span class="alloc-name">Debt Repayments</span><span class="alloc-amt cr" id="b-debt-total">RM —</span></div>
+            <div class="pbar"><div class="pfill" id="b-debt-bar" style="width:0%;background:var(--red)"></div></div>
+            <div class="alloc-pct" id="b-debt-pct">—% of income</div>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-top"><span class="alloc-name">Daily Living / Food</span><span class="alloc-amt ca">~RM 600</span></div>
+            <div class="pbar"><div class="pfill" style="width:14.8%;background:var(--amber)"></div></div>
+            <div class="alloc-pct">~14.8% of income</div>
+          </div>
+          <div class="alloc-row">
+            <div class="alloc-top"><span class="alloc-name">Buffer / Savings</span><span class="alloc-amt cg" id="b-savings">RM —</span></div>
+            <div class="pbar"><div class="pfill" id="b-savings-bar" style="width:0%;background:var(--green)"></div></div>
+            <div class="alloc-pct" id="b-savings-pct">—% of income</div>
+          </div>
+        </div>
+
+        <div class="alert a" style="margin-top:16px">
+          <div class="alert-title">When debts clear — what opens up</div>
+          Shopee gone (Jul 2026) → +RM 128/month<br>
+          Personal Loan gone → +RM 650/month + RM 450 interest saved<br>
+          Hainan gone (Oct 2026) → +RM 200/month<br>
+          All active debts clear → feels like <strong>RM ~5,250 take-home</strong>
+        </div>
+
+        <div style="margin-top:16px">
+          <div class="sl">Side Hustle Tracker</div>
+          <div class="card">
+            <div class="ch"><span class="ch-label">F&B / TouchDesigner</span><span class="ch-val cd">Not active yet</span></div>
+            <div class="row"><span class="rl">Side income this month</span><span class="rv cg editable" contenteditable>RM 0.00</span></div>
+            <div class="row"><span class="rl">Side expenses</span><span class="rv cr editable" contenteditable>RM 0.00</span></div>
+            <div class="row"><span class="rl">Capital invested</span><span class="rv cd editable" contenteditable>RM 0.00</span></div>
+            <div class="rtotal"><span class="rl">Net</span><span class="rv cd">RM 0.00</span></div>
+            <div style="padding:10px 16px;font-size:12px;color:var(--tx3);border-top:1px solid var(--line)">
+              Any side income → straight to Personal Loan. RM 300/month side hustle = ~3 months off your payoff.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sl">Daily Food Plan</div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ch-label">WFO Days</span><span class="ch-val ca">RM 20 / day</span></div>
+          <div class="row"><span class="rl">Breakfast</span><span class="rv cg">RM 0 (overnight oats)</span></div>
+          <div class="row"><span class="rl">Lunch</span><span class="rv ca editable" contenteditable>RM 10.00</span></div>
+          <div class="row"><span class="rl">Snack</span><span class="rv cd editable" contenteditable>RM 0.00</span></div>
+          <div class="row"><span class="rl">Dinner</span><span class="rv ca editable" contenteditable>RM 10.00</span></div>
+          <div class="rtotal"><span class="rl">Per WFO Day</span><span class="rv ca">RM 20.00</span></div>
+          <div style="padding:10px 16px;font-size:12px;color:var(--tx3)">~20 WFO days = <span class="ca">~RM 400/month</span></div>
+        </div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ch-label">WFH Days</span><span class="ch-val cg">RM 0 / day</span></div>
+          <div class="row"><span class="rl">Breakfast</span><span class="rv cg">RM 0</span></div>
+          <div class="row"><span class="rl">Lunch</span><span class="rv cg">RM 0 (home cooked)</span></div>
+          <div class="row"><span class="rl">Dinner</span><span class="rv cg">RM 0</span></div>
+          <div class="rtotal"><span class="rl">Per WFH Day</span><span class="rv cg">RM 0.00</span></div>
+          <div style="padding:10px 16px;font-size:12px;color:var(--tx3)">Covered by RM 200 grocery budget</div>
+        </div>
+        <div class="sl">Monthly Food Budget</div>
+        <div class="card">
+          <div class="row"><span class="rl">Grocery allocation</span><span class="rv cg">RM 200.00</span></div>
+          <div class="row"><span class="rl">WFO food estimate</span><span class="rv ca">RM 400.00</span></div>
+          <div class="row"><span class="rl">Logged this month</span><span class="rv" id="b-logged">RM 0.00</span></div>
+          <div class="rtotal"><span class="rl">Food Spent / Budget</span><span class="rv" id="b-food-pct">RM 0 / RM 600</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /budget -->
+
+</div><!-- /shell -->
+
+<!-- ── BOTTOM NAV (mobile) ── -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" id="bn-dashboard" onclick="go('dashboard',this,'bn-dashboard')">
+      <span class="bnav-icon">📊</span>
+      <span class="bnav-label">Dashboard</span>
+    </button>
+    <button class="bnav-item" id="bn-expenses" onclick="go('expenses',this,'bn-expenses')">
+      <span class="bnav-icon">💸</span>
+      <span class="bnav-label">Expenses</span>
+    </button>
+    <button class="bnav-item" id="bn-debts" onclick="go('debts',this,'bn-debts')">
+      <span class="bnav-icon">💳</span>
+      <span class="bnav-label">Debts</span>
+    </button>
+    <button class="bnav-item" id="bn-budget" onclick="go('budget',this,'bn-budget')">
+      <span class="bnav-icon">📅</span>
+      <span class="bnav-label">Budget</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── EDIT EXPENSE MODAL ── -->
+<div class="modal-overlay" id="edit-modal" onclick="closeEditModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Edit Expense</div>
+    <input type="hidden" id="edit-id">
+    <div class="field">
+      <label class="flabel">Description</label>
+      <input type="text" id="edit-desc" placeholder="Description">
+    </div>
+    <div class="field">
+      <label class="flabel">Amount (RM)</label>
+      <input type="number" id="edit-amount" placeholder="0.00" step="0.01" min="0">
+    </div>
+    <div class="field">
+      <label class="flabel">Paid With</label>
+      <select id="edit-wallet">
+        <option value="maybank">💳 Maybank Debit</option>
+        <option value="mae">💜 MAE Card</option>
+        <option value="tng">🟦 TnG eWallet</option>
+        <option value="cash">💵 Cash</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="flabel">Category</label>
+      <select id="edit-cat">
+        <option value="food">Food</option>
+        <option value="transport">Transport</option>
+        <option value="lifestyle">Lifestyle</option>
+        <option value="debt-extra">Debt (extra payment)</option>
+        <option value="misc">Misc</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="flabel">Day Type</label>
+      <select id="edit-type">
+        <option value="WFO">WFO Day</option>
+        <option value="WFH">WFH Day</option>
+        <option value="Weekend">Weekend</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn" onclick="saveEdit()" style="margin-top:0">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── NEW MONTH MODAL ── -->
+<div class="modal-overlay" id="newmonth-modal" onclick="closeNewMonthModal(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Start New Month</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:16px;line-height:1.7">
+      Current month expenses will be archived. Debt balances and wallet opening balances carry forward automatically.
+    </div>
+    <div class="field">
+      <label class="flabel">New Month</label>
+      <select id="nm-select">
+        <option value="">Select month…</option>
+      </select>
+    </div>
+    <div style="margin-bottom:16px">
+      <div class="sl" style="margin-bottom:8px">Opening Balances for New Month</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">Pre-filled from current available balances. Adjust if needed.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="field" style="margin-bottom:0">
+          <label class="flabel">💳 Maybank</label>
+          <input type="number" id="nm-w-maybank" placeholder="0.00" step="0.01">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="flabel">💜 MAE</label>
+          <input type="number" id="nm-w-mae" placeholder="0.00" step="0.01">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="flabel">🟦 TnG</label>
+          <input type="number" id="nm-w-tng" placeholder="0.00" step="0.01">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label class="flabel">💵 Cash</label>
+          <input type="number" id="nm-w-cash" placeholder="0.00" step="0.01">
+        </div>
+      </div>
+    </div>
+    <div id="nm-archive-preview" style="margin-bottom:16px;display:none">
+      <div class="sl" style="margin-bottom:8px">Previous Months</div>
+      <div id="nm-archive-list"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNewMonthModal()">Cancel</button>
+      <button class="btn" onclick="confirmNewMonth()" style="margin-top:0">Start New Month →</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FINTRACK v6 — iPhone-First · Monthly Cycles · Debt Payments
+// ═══════════════════════════════════════════════════════════════
+
+const K_STATE     = 'ft_v6_state';
+const INCOME      = 4050;
+const FIXED       = 1760.77;
+const FOOD_BUDGET = 600;
+const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── DEFAULT STATE ─────────────────────────────────────────────
+const DEFAULTS = {
+  activeMonth: fmtMonth(new Date()),
+  debts: {
+    personalLoan: { name:'Personal Loan', balance:4800,    monthly:650,    interest:450  },
+    shopee:       { name:'Shopee BNPL',   balance:171.44,  monthly:128.26, interest:0    },
+    cimb:         { name:'CIMB SAA',      balance:2400,    monthly:220,    interest:0,   total:3400, paid:1000 },
+    hainan:       { name:'Hainan',        balance:995,     monthly:200,    interest:0    },
+    caryna:       { name:'Caryna',        balance:1253.11, monthly:0,      interest:0    },
+    ptptn:        { name:'PTPTN',         balance:19597,   monthly:0,      interest:0    },
+  },
+  wallets:      { maybank:0, mae:0, tng:0, cash:0 },
+  transactions: [],   // { id, month, date, desc, amount, wallet, cat, type, debtKey? }
+  archive:      []    // { month, label, transactions, walletOpening }
+};
+
+function fmtMonth(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+function labelMonth(key) {
+  const [y, m] = key.split('-');
+  return MN[parseInt(m)-1] + ' ' + y;
+}
+
+// ── LOAD / MIGRATE STATE ──────────────────────────────────────
+let state;
+try {
+  // Try v6 first
+  const s6 = localStorage.getItem(K_STATE);
+  if (s6) {
+    state = JSON.parse(s6);
+    Object.keys(DEFAULTS.debts).forEach(k => {
+      if (!state.debts[k]) state.debts[k] = { ...DEFAULTS.debts[k] };
+    });
+    if (!state.archive) state.archive = [];
+    if (!state.activeMonth) state.activeMonth = fmtMonth(new Date());
+  } else {
+    state = JSON.parse(JSON.stringify(DEFAULTS));
+    // Migrate from v5
+    try {
+      const s5 = localStorage.getItem('ft_v5_state');
+      if (s5) {
+        const old = JSON.parse(s5);
+        if (old.transactions) {
+          const m = state.activeMonth;
+          state.transactions = old.transactions.map(t => ({ ...t, month: t.month || m }));
+        }
+        if (old.wallets) Object.assign(state.wallets, old.wallets);
+        if (old.debts) {
+          Object.keys(old.debts).forEach(k => {
+            if (state.debts[k]) Object.assign(state.debts[k], old.debts[k]);
+          });
+        }
+      }
+    } catch(e) {}
+  }
+} catch(e) {
+  state = JSON.parse(JSON.stringify(DEFAULTS));
+}
+
+function saveState() {
+  localStorage.setItem(K_STATE, JSON.stringify(state));
+}
+
+// ── DERIVE (reads only from state, scoped to activeMonth) ─────
+function derive() {
+  const D  = state.debts;
+  const W  = state.wallets;
+  const AM = state.activeMonth;
+  // Only current month transactions
+  const T  = state.transactions.filter(t => (t.month || AM) === AM);
+
+  const debtMonthly     = Object.values(D).reduce((s,d) => s + (d.monthly||0), 0);
+  const debtOutstanding = Object.values(D).reduce((s,d) => s + (d.balance||0), 0);
+  const totalOutflow    = FIXED + debtMonthly;
+  const available       = INCOME - totalOutflow;
+  const savingsRate     = Math.max(0, (available / INCOME) * 100);
+
+  // Per-wallet: spend & current balance
+  const wKeys = ['maybank','mae','tng','cash'];
+  const walletSpend = {};
+  wKeys.forEach(k => { walletSpend[k] = 0; });
+  T.forEach(t => { if (walletSpend[t.wallet] !== undefined) walletSpend[t.wallet] += t.amount; });
+  const walletCurrent = {};
+  wKeys.forEach(k => { walletCurrent[k] = (W[k]||0) - walletSpend[k]; });
+  const walletTotal = wKeys.reduce((s,k) => s + walletCurrent[k], 0);
+
+  const catTotals = { food:0, transport:0, lifestyle:0, 'debt-extra':0, misc:0, 'debt-payment':0 };
+  T.forEach(t => { if (catTotals[t.cat] !== undefined) catTotals[t.cat] += t.amount; });
+  const totalSpent = T.filter(t => t.cat !== 'debt-payment').reduce((s,t) => s + t.amount, 0);
+  const foodLeft   = Math.max(available - totalSpent, 0);
+
+  return { debtMonthly, debtOutstanding, totalOutflow, available, savingsRate,
+           walletSpend, walletCurrent, walletTotal, catTotals, totalSpent, foodLeft, T };
+}
+
+// ── PAYOFF MATH ───────────────────────────────────────────────
+function payoffMonths(balance, monthly, fixedInterest) {
+  const effective = monthly - (fixedInterest||0);
+  if (effective <= 0 || !monthly || balance <= 0) return null;
+  return Math.ceil(balance / effective);
+}
+function payoffDate(months) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return MN[d.getMonth()] + ' ' + d.getFullYear();
+}
+function buildEtaText(balance, monthly, fixedInterest) {
+  if (!monthly || monthly <= 0) return null;
+  const months = payoffMonths(balance, monthly, fixedInterest);
+  if (!months) return null;
+  const fi = fixedInterest||0;
+  let text = `RM ${monthly}/month → ~${months} month${months===1?'':'s'} (${payoffDate(months)})`;
+  if (fi > 0) text += ` · interest total: RM ${(fi * months).toFixed(0)}`;
+  return { months, text };
+}
+
+// ── MAIN RECALC ───────────────────────────────────────────────
+function recalc() {
+  const { debtMonthly, debtOutstanding, totalOutflow, available, savingsRate,
+          walletSpend, walletCurrent, walletTotal, catTotals, totalSpent, foodLeft } = derive();
+  const D = state.debts;
+
+  // ── Dashboard ──
+  setText('d-outflow',        fmt(totalOutflow));
+  setText('d-available',      fmt(available));
+  setText('d-total-debt',     fmt(debtOutstanding));
+  setText('d-debt-monthly',   fmt(debtMonthly));
+  setText('d-debt-total-row', fmt(debtMonthly));
+  setText('dd-caryna',        (D.caryna.monthly||0).toFixed(0));
+  setText('dd-ptptn',         (D.ptptn.monthly||0).toFixed(0));
+  setText('d-savings-rate',   savingsRate.toFixed(1) + '%');
+  setStyle('d-savings-bar',   'width', Math.min(savingsRate*2,100)+'%');
+  setText('d-logged',         fmt(totalSpent));
+  setText('d-food-left',      fmt(foodLeft));
+  setText('d-remaining',      fmt(foodLeft));
+  setText('d-wallet-total',   fmt(walletTotal));
+  setText('dw-maybank',       fmt(walletCurrent.maybank));
+  setText('dw-mae',           fmt(walletCurrent.mae));
+  setText('dw-tng',           fmt(walletCurrent.tng));
+  setText('dw-cash',          fmt(walletCurrent.cash));
+
+  colourEl('d-available', 'stat-num', available < 400 ? 'cr' : available < 700 ? 'ca' : 'cg');
+  colourEl('d-food-left', 'ch-val',   foodLeft  < 200 ? 'cr' : foodLeft  < 400 ? 'ca' : 'cg');
+  colourEl('d-remaining', 'rv',       foodLeft  < 200 ? 'cr' : foodLeft  < 400 ? 'ca' : 'cg');
+  const srEl = document.getElementById('d-savings-rate');
+  if (srEl) srEl.className = savingsRate >= 30 ? 'cg' : savingsRate >= 20 ? 'ca' : 'cr';
+
+  updateTimeline();
+
+  // ── Budget ──
+  const debtPct    = (debtMonthly/INCOME*100).toFixed(1);
+  const savingsPct = Math.max(0,savingsRate).toFixed(1);
+  setText('b-debt-total',   fmt(debtMonthly));
+  setStyle('b-debt-bar',    'width', Math.min(debtMonthly/INCOME*100,100)+'%');
+  setText('b-debt-pct',     debtPct + '% of income');
+  setText('b-savings',      fmt(Math.max(0, available - FOOD_BUDGET)));
+  setStyle('b-savings-bar', 'width', Math.min(savingsRate*2,100)+'%');
+  setText('b-savings-pct',  savingsPct + '% of income');
+  setText('b-logged',       fmt(totalSpent));
+  setText('b-food-pct',     fmt(totalSpent) + ' / RM ' + FOOD_BUDGET);
+
+  // ── Wallets (expenses tab) ──
+  setText('wallet-total-exp', fmt(walletTotal));
+  const wKeys = ['maybank','mae','tng','cash'];
+  wKeys.forEach(k => {
+    const bal = walletCurrent[k];
+    const sp  = walletSpend[k] || 0;
+    const bEl = document.getElementById('w-bal-' + k);
+    const sEl = document.getElementById('w-spent-' + k);
+    if (bEl) {
+      bEl.textContent = 'Available: ' + fmt(bal);
+      bEl.style.color = bal < 0 ? 'var(--red)' : bal < 100 ? 'var(--amber)' : 'var(--green)';
+    }
+    if (sEl) sEl.textContent = 'Spent: ' + fmt(sp);
+  });
+
+  // ── Debt cards ──
+  updateDebtCard('personalLoan', D.personalLoan.balance, D.personalLoan.monthly, D.personalLoan.interest, 'var(--red)');
+  updateDebtCard('shopee',       D.shopee.balance,       D.shopee.monthly,       0,                        'var(--green)');
+  updateDebtCard('cimb',         D.cimb.balance,         D.cimb.monthly,         0,                        'var(--amber)');
+  updateDebtCard('hainan',       D.hainan.balance,       D.hainan.monthly,       0,                        'var(--tx3)');
+  updateDebtCard('caryna',       D.caryna.balance,       D.caryna.monthly,       0,                        'var(--pink)');
+  updateDebtCard('ptptn',        D.ptptn.balance,        D.ptptn.monthly,        0,                        'var(--blue)');
+
+  // CIMB derived display
+  const cimbTotal = D.cimb.total || 3400;
+  const cimbPaid  = cimbTotal - D.cimb.balance;
+  const cimbPct   = Math.min(100, Math.round(cimbPaid / cimbTotal * 100));
+  setText('d-cimb-remaining',  D.cimb.balance.toFixed(2));
+  setText('d-cimb-prog-label', `RM ${cimbPaid.toFixed(0)} of RM ${cimbTotal.toFixed(0)} cleared`);
+  setText('d-cimb-pct',        cimbPct + '%');
+  setStyle('d-cimb-pbar',      'width', cimbPct + '%');
+
+  // Personal Loan principal derived
+  setText('d-pl-principal', Math.max(0,(D.personalLoan.monthly||0)-(D.personalLoan.interest||0)).toFixed(0));
+
+  updatePayoffTable();
+}
+
+function updateDebtCard(key, balance, monthly, fi, color) {
+  const el = document.getElementById('eta-' + key);
+  if (!el) return;
+  if (!monthly || monthly <= 0) {
+    el.textContent = 'No payment set — enter a monthly amount to see payoff timeline.';
+    el.style.color = 'var(--tx3)';
+    if (document.getElementById('payoff-'+key)) document.getElementById('payoff-'+key).textContent = '—';
+    return;
+  }
+  const result = buildEtaText(balance, monthly, fi);
+  if (!result) {
+    el.textContent = 'Payment ≤ interest — balance will never clear.';
+    el.style.color = 'var(--red)'; return;
+  }
+  el.textContent = result.text;
+  el.style.color  = result.months <= 6 ? 'var(--green)' : result.months <= 18 ? 'var(--amber)' : color;
+  const pe = document.getElementById('payoff-'+key);
+  if (pe) pe.textContent = result.months <= 12 ? payoffDate(result.months) : `~${result.months}mo`;
+}
+
+function updateTimeline() {
+  const D = state.debts;
+  [['tl-shopee',D.shopee,0],['tl-personalLoan',D.personalLoan,D.personalLoan.interest||0],
+   ['tl-hainan',D.hainan,0],['tl-cimb',D.cimb,0],['tl-caryna',D.caryna,0],['tl-ptptn',D.ptptn,0]
+  ].forEach(([id,d,fi]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const m = payoffMonths(d.balance, d.monthly, fi);
+    el.textContent = m ? payoffDate(m) : 'Not set';
+  });
+}
+
+function updatePayoffTable() {
+  const D = state.debts;
+  [['pt-shopee',D.shopee,0],['pt-personalLoan',D.personalLoan,D.personalLoan.interest||0],
+   ['pt-ptptn',D.ptptn,0],['pt-hainan',D.hainan,0],['pt-cimb',D.cimb,0],['pt-caryna',D.caryna,0]
+  ].forEach(([p,d,fi]) => {
+    const m = payoffMonths(d.balance, d.monthly, fi);
+    if (document.getElementById(p+'-bal')) document.getElementById(p+'-bal').textContent = 'RM ' + (d.balance||0).toFixed(2);
+    if (document.getElementById(p+'-mo'))  document.getElementById(p+'-mo').textContent  = d.monthly > 0 ? fmt(d.monthly) : 'Not set';
+    if (document.getElementById(p+'-eta')) document.getElementById(p+'-eta').textContent = m ? payoffDate(m) : '—';
+  });
+}
+
+// ── DEBT EDITING ──────────────────────────────────────────────
+function onDebtEdit(key, field, el) {
+  const val = parseFloat(el.textContent.replace(/[^0-9.]/g,'')) || 0;
+  if (key === 'cimb') {
+    if (field === 'total') { state.debts.cimb.total = val; state.debts.cimb.balance = Math.max(0, val - (state.debts.cimb.paid||0)); }
+    else if (field === 'paid') { state.debts.cimb.paid = val; state.debts.cimb.balance = Math.max(0, (state.debts.cimb.total||3400) - val); }
+  } else {
+    state.debts[key][field] = val;
+  }
+  saveState(); recalc();
+}
+function onMonthlyInput(key) {
+  state.debts[key].monthly = parseFloat(document.getElementById(key+'-monthly').value) || 0;
+  saveState(); recalc();
+}
+function onWalletInput(key) {
+  state.wallets[key] = parseFloat(document.getElementById('w-'+key).value) || 0;
+  saveState(); recalc();
+}
+
+// ── DEBT PAYMENT LOGGING ──────────────────────────────────────
+function toggleDebtPay(key) {
+  const el = document.getElementById('dpf-' + key);
+  if (!el) return;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (!open) {
+    const amtEl = document.getElementById('dpf-'+key+'-amt');
+    if (amtEl) { amtEl.value = state.debts[key].monthly || ''; amtEl.focus(); }
+  }
+}
+
+function logDebtPayment(key) {
+  const amtEl    = document.getElementById('dpf-'+key+'-amt');
+  const walletEl = document.getElementById('dpf-'+key+'-wallet');
+  const amount   = parseFloat(amtEl?.value) || 0;
+  const wallet   = walletEl?.value || 'maybank';
+  const debt     = state.debts[key];
+
+  if (!amount || amount <= 0) { toast('Enter payment amount'); return; }
+
+  // Overdraft check
+  const { walletCurrent } = derive();
+  if (amount > (walletCurrent[wallet]||0)) {
+    if (!confirm(`⚠ Overdraft: ${wLabel[wallet]} only has RM ${(walletCurrent[wallet]||0).toFixed(2)}. Continue?`)) return;
+  }
+
+  // Deduct from debt balance
+  const actualReduction = Math.min(amount, debt.balance);
+  state.debts[key].balance = Math.max(0, debt.balance - actualReduction);
+
+  // Create linked transaction
+  const now = new Date();
+  state.transactions.unshift({
+    id: Date.now(),
+    month: state.activeMonth,
+    date: now.toLocaleDateString('en-MY', { day:'2-digit', month:'short' }),
+    desc: `${debt.name} — payment`,
+    amount,
+    wallet,
+    cat: 'debt-payment',
+    type: 'WFO',
+    debtKey: key
+  });
+
+  // Update cimb paid tracking
+  if (key === 'cimb') {
+    state.debts.cimb.paid = (state.debts.cimb.paid||0) + actualReduction;
+  }
+
+  saveState();
+  // Close form, reset
+  document.getElementById('dpf-'+key).style.display = 'none';
+  if (amtEl) amtEl.value = '';
+  renderExpenses(); recalc();
+  toast(`✓ RM ${amount.toFixed(2)} paid to ${debt.name} — balance now RM ${state.debts[key].balance.toFixed(2)}`);
+}
+
+// ── EXPENSE LOGGING ───────────────────────────────────────────
+const wLabel = { maybank:'💳 Maybank', mae:'💜 MAE', tng:'🟦 TnG', cash:'💵 Cash' };
+const catColor = { food:'ca', transport:'cb', lifestyle:'cg', 'debt-extra':'cr', 'debt-payment':'cr', misc:'' };
+
+function logExpense() {
+  const desc   = document.getElementById('exp-desc').value.trim();
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  const wallet = document.getElementById('exp-wallet').value;
+  const cat    = document.getElementById('exp-cat').value;
+  const type   = document.getElementById('exp-type').value;
+  if (!desc || isNaN(amount) || amount <= 0) { toast('Enter description + amount'); return; }
+
+  const { walletCurrent } = derive();
+  if (amount > (walletCurrent[wallet]||0)) {
+    if (!confirm(`⚠ Overdraft: ${wLabel[wallet]} available RM ${(walletCurrent[wallet]||0).toFixed(2)}, spending RM ${amount.toFixed(2)}. Continue?`)) return;
+  }
+
+  const now = new Date();
+  state.transactions.unshift({
+    id: Date.now(),
+    month: state.activeMonth,
+    date: now.toLocaleDateString('en-MY', { day:'2-digit', month:'short' }),
+    desc, amount, wallet, cat, type
+  });
+  saveState();
+  document.getElementById('exp-desc').value = '';
+  document.getElementById('exp-amount').value = '';
+  renderExpenses(); recalc();
+  toast(`Logged: RM ${amount.toFixed(2)} from ${wLabel[wallet]}`);
+}
+
+function deleteExpense(id) {
+  state.transactions = state.transactions.filter(t => t.id !== id);
+  saveState(); renderExpenses(); recalc();
+}
+
+function clearLog() {
+  if (!confirm('Clear all expenses for this month? Wallet opening balances are unaffected.')) return;
+  state.transactions = state.transactions.filter(t => (t.month||state.activeMonth) !== state.activeMonth);
+  saveState(); renderExpenses(); recalc();
+}
+
+// ── EXPENSE EDITING ───────────────────────────────────────────
+function openEditModal(id) {
+  const t = state.transactions.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('edit-id').value       = id;
+  document.getElementById('edit-desc').value     = t.desc;
+  document.getElementById('edit-amount').value   = t.amount;
+  document.getElementById('edit-wallet').value   = t.wallet;
+  document.getElementById('edit-cat').value      = t.cat;
+  document.getElementById('edit-type').value     = t.type || 'WFO';
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal(e) {
+  if (e && e.target !== document.getElementById('edit-modal')) return;
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function saveEdit() {
+  const id     = parseInt(document.getElementById('edit-id').value);
+  const desc   = document.getElementById('edit-desc').value.trim();
+  const amount = parseFloat(document.getElementById('edit-amount').value);
+  const wallet = document.getElementById('edit-wallet').value;
+  const cat    = document.getElementById('edit-cat').value;
+  const type   = document.getElementById('edit-type').value;
+  if (!desc || isNaN(amount) || amount <= 0) { toast('Fill in all fields'); return; }
+
+  const idx = state.transactions.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  state.transactions[idx] = { ...state.transactions[idx], desc, amount, wallet, cat, type };
+  saveState();
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  renderExpenses(); recalc();
+  toast('Expense updated');
+}
+
+// ── RENDER EXPENSES ───────────────────────────────────────────
+function renderExpenses() {
+  const AM = state.activeMonth;
+  const T  = state.transactions.filter(t => (t.month||AM) === AM);
+  const totals = { food:0, transport:0, lifestyle:0, 'debt-extra':0, misc:0 };
+  T.filter(t => t.cat !== 'debt-payment').forEach(t => { if (totals[t.cat] !== undefined) totals[t.cat] += t.amount; });
+  const total = Object.values(totals).reduce((a,b)=>a+b,0);
+
+  setText('cat-food',       fmt(totals.food));
+  setText('cat-transport',  fmt(totals.transport));
+  setText('cat-lifestyle',  fmt(totals.lifestyle));
+  setText('cat-debt-extra', fmt(totals['debt-extra']));
+  setText('cat-misc',       fmt(totals.misc));
+  setText('total-spent',    fmt(total));
+
+  // Desktop table
+  const tbody = document.getElementById('expense-tbody');
+  if (tbody) {
+    if (!T.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Nothing logged this month.</div></td></tr>';
+    } else {
+      tbody.innerHTML = T.map(t => `
+        <tr>
+          <td style="color:var(--tx3);white-space:nowrap;font-family:var(--mono);font-size:12px">${t.date}</td>
+          <td>${t.desc}</td>
+          <td class="${catColor[t.cat]||''}" style="font-family:var(--mono);font-size:11px">${t.cat}</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">${wLabel[t.wallet]||t.wallet}</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--tx3)">${t.type||''}</td>
+          <td style="text-align:right;font-family:var(--mono);font-weight:500;color:var(--amber)">RM ${t.amount.toFixed(2)}</td>
+          <td style="white-space:nowrap">
+            <button class="edit-btn" onclick="openEditModal(${t.id})">edit</button>
+            <button class="del" onclick="deleteExpense(${t.id})">×</button>
+          </td>
+        </tr>`).join('');
+    }
+  }
+
+  // Mobile cards
+  const cards = document.getElementById('expense-cards');
+  if (cards) {
+    if (!T.length) {
+      cards.innerHTML = '<div class="empty">Nothing logged this month.</div>';
+    } else {
+      cards.innerHTML = T.map(t => `
+        <div class="exp-card">
+          <div class="exp-card-left">
+            <div class="exp-card-desc">${t.desc}</div>
+            <div class="exp-card-meta">
+              <span>${t.date}</span>
+              <span class="${catColor[t.cat]||'cd'}">${t.cat}</span>
+              <span>${wLabel[t.wallet]||t.wallet}</span>
+            </div>
+          </div>
+          <div class="exp-card-right">
+            <span class="exp-card-amount">RM ${t.amount.toFixed(2)}</span>
+            <div class="exp-card-actions">
+              <button class="edit-btn" onclick="openEditModal(${t.id})" style="padding:6px 8px">✎</button>
+              <button class="del" onclick="deleteExpense(${t.id})">×</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+  }
+}
+
+// ── MONTHLY CYCLE ─────────────────────────────────────────────
+function openNewMonthModal() {
+  // Pre-fill next month options
+  const sel = document.getElementById('nm-select');
+  sel.innerHTML = '<option value="">Select month…</option>';
+  const [cy, cm] = state.activeMonth.split('-').map(Number);
+  for (let i = 1; i <= 3; i++) {
+    const d = new Date(cy, cm - 1 + i, 1);
+    const key = fmtMonth(d);
+    const lbl = labelMonth(key);
+    sel.innerHTML += `<option value="${key}">${lbl}</option>`;
+  }
+  sel.value = ''; // default blank
+
+  // Pre-fill opening balances from current available
+  const { walletCurrent } = derive();
+  ['maybank','mae','tng','cash'].forEach(k => {
+    const el = document.getElementById('nm-w-'+k);
+    if (el) el.value = Math.max(0, walletCurrent[k]).toFixed(2);
+  });
+
+  // Show archive if any
+  const archEl = document.getElementById('nm-archive-preview');
+  const archList = document.getElementById('nm-archive-list');
+  if (state.archive.length > 0) {
+    archEl.style.display = 'block';
+    archList.innerHTML = state.archive.slice().reverse().map(a => `
+      <div class="archive-row">
+        <span>${a.label}</span>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--tx3)">${a.transactions.length} transactions</span>
+      </div>`).join('');
+  } else {
+    archEl.style.display = 'none';
+  }
+
+  document.getElementById('newmonth-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNewMonthModal(e) {
+  if (e && e.target !== document.getElementById('newmonth-modal')) return;
+  document.getElementById('newmonth-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function confirmNewMonth() {
+  const newMonth = document.getElementById('nm-select').value;
+  if (!newMonth) { toast('Select a month first'); return; }
+
+  // Archive current month
+  const AM = state.activeMonth;
+  const currentT = state.transactions.filter(t => (t.month||AM) === AM);
+  state.archive.push({
+    month: AM,
+    label: labelMonth(AM),
+    transactions: currentT,
+    walletOpening: { ...state.wallets }
+  });
+
+  // New opening balances
+  const newWallets = {};
+  ['maybank','mae','tng','cash'].forEach(k => {
+    newWallets[k] = parseFloat(document.getElementById('nm-w-'+k)?.value) || 0;
+  });
+
+  // Keep only non-current-month transactions (other archived months)
+  state.transactions = state.transactions.filter(t => (t.month||AM) !== AM);
+  state.activeMonth = newMonth;
+  state.wallets = newWallets;
+
+  // Sync wallet inputs
+  ['maybank','mae','tng','cash'].forEach(k => {
+    const el = document.getElementById('w-'+k);
+    if (el) el.value = newWallets[k] || '';
+  });
+
+  saveState();
+  closeNewMonthModal();
+  updateMonthHeader();
+  renderExpenses();
+  recalc();
+  toast(`✓ Started ${labelMonth(newMonth)}`);
+}
+
+function updateMonthHeader() {
+  const el = document.getElementById('hdate');
+  if (el) el.textContent = labelMonth(state.activeMonth);
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────
+// tab = desktop tab button OR id string; bnId = bottom nav button id
+function go(id, tabEl, bnId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  if (tabEl && tabEl.classList) tabEl.classList.add('active');
+  if (bnId) { const b = document.getElementById(bnId); if (b) b.classList.add('active'); }
+  // Sync top tab if triggered from bottom nav
+  if (bnId) {
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.getAttribute('onclick') && t.getAttribute('onclick').includes("'"+id+"'")) t.classList.add('active');
+    });
+  }
+  recalc(); renderExpenses();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+function init() {
+  // Register service worker
+  // Register SW only when served (not file://) and sw.js exists alongside
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    fetch('sw.js', { method: 'HEAD' })
+      .then(r => { if (r.ok) navigator.serviceWorker.register('sw.js'); })
+      .catch(() => {});
+  }
+
+  updateMonthHeader();
+
+  // Wallet inputs
+  ['maybank','mae','tng','cash'].forEach(k => {
+    const el = document.getElementById('w-'+k);
+    if (el) el.value = state.wallets[k] || '';
+  });
+
+  // Debt monthly inputs
+  document.getElementById('caryna-monthly').value = state.debts.caryna.monthly || 0;
+  document.getElementById('ptptn-monthly').value  = state.debts.ptptn.monthly  || 0;
+
+  // Debt contenteditable fields from state
+  setField('d-pl-monthly',     state.debts.personalLoan.monthly);
+  setField('d-pl-interest',    state.debts.personalLoan.interest);
+  setField('d-pl-balance',     state.debts.personalLoan.balance);
+  setField('d-shopee-balance', state.debts.shopee.balance);
+  setField('d-shopee-monthly', state.debts.shopee.monthly);
+  setField('d-cimb-total',     state.debts.cimb.total   || 3400);
+  setField('d-cimb-paid',      state.debts.cimb.paid    || 1000);
+  setField('d-hainan-balance', state.debts.hainan.balance);
+  setField('d-hainan-monthly', state.debts.hainan.monthly);
+  setField('caryna-outstanding', state.debts.caryna.balance);
+  setField('ptptn-outstanding',  state.debts.ptptn.balance);
+
+  recalc(); renderExpenses();
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmt(n) { return 'RM ' + (n||0).toFixed(2); }
+function setText(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+function setStyle(id, p, v) { const e = document.getElementById(id); if (e) e.style[p] = v; }
+function colourEl(id, base, accent) { const e = document.getElementById(id); if (e) e.className = base+' '+accent; }
+function setField(id, val) {
+  const el = document.getElementById(id);
+  if (!el || document.activeElement === el) return;
+  el.textContent = typeof val === 'number'
+    ? (Number.isInteger(val) ? val.toString() : parseFloat(val.toFixed(2)).toString())
+    : String(val);
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+init();
+</script>
+</body>
+</html>
